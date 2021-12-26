@@ -1,4 +1,4 @@
-#import "GoogleMlKitPlugin.h"
+#import "GoogleBarcodeKitPlugin.h"
 #import <MLKitBarcodeScanning/MLKitBarcodeScanning.h>
 
 #define startBarcodeScanner @"vision#startBarcodeScanner"

@@ -1,4 +1,4 @@
-#import "GoogleMlKitPlugin.h"
+#import "GoogleBarcodeKitPlugin.h"
 
 @implementation MLKVisionImage(FlutterPlugin)
 

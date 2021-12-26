@@ -1,7 +1,7 @@
-name: google_ml_kit
-description: A Flutter plugin to implement google's standalone ml kit made for mobile platform.
+name: google_barcode_kit
+description: A Flutter barcode plugin to implement google's standalone ml kit made for mobile platform.
 version: 0.7.3
-homepage: https://github.com/bharat-biradar/Google-Ml-Kit-plugin
+homepage: https://github.com/hugobrancowb/google_barcode_kit
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
@@ -27,8 +27,8 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.google_ml_kit
-        pluginClass: GoogleMlKitPlugin
+        package: com.google_barcode_kit
+        pluginClass: GoogleBarcodeKitPlugin
       ios:
-        pluginClass: GoogleMlKitPlugin
+        pluginClass: GoogleBarcodeKitPlugin
 

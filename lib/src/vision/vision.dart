@@ -7,18 +7,6 @@ import 'package:flutter/services.dart';
 
 part 'barcode_scanner.dart';
 
-part 'digital_ink_recognizer.dart';
-
-part 'face_detector.dart';
-
-part 'label_detector.dart';
-
-part 'pose_detector.dart';
-
-part 'text_detector.dart';
-
-part 'object_detector.dart';
-
 // To indicate the format of image while creating input image from bytes
 enum InputImageFormat { NV21, YV12, YUV_420_888, YUV420, BGRA8888 }
 
@@ -35,8 +23,7 @@ extension InputImageFormatMethods on InputImageFormat {
   int get rawValue => _values[this] ?? 17;
 
   static InputImageFormat? fromRawValue(int rawValue) {
-    return InputImageFormatMethods._values
-        .map((k, v) => MapEntry(v, k))[rawValue];
+    return InputImageFormatMethods._values.map((k, v) => MapEntry(v, k))[rawValue];
   }
 }
 
@@ -44,12 +31,7 @@ extension InputImageFormatMethods on InputImageFormat {
 enum CustomLocalModel { asset, file }
 
 // The camera rotation angle to be specified
-enum InputImageRotation {
-  Rotation_0deg,
-  Rotation_90deg,
-  Rotation_180deg,
-  Rotation_270deg
-}
+enum InputImageRotation { Rotation_0deg, Rotation_90deg, Rotation_180deg, Rotation_270deg }
 
 extension InputImageRotationMethods on InputImageRotation {
   static Map<InputImageRotation, int> get _values => {
@@ -62,8 +44,7 @@ extension InputImageRotationMethods on InputImageRotation {
   int get rawValue => _values[this] ?? 0;
 
   static InputImageRotation? fromRawValue(int rawValue) {
-    return InputImageRotationMethods._values
-        .map((k, v) => MapEntry(v, k))[rawValue];
+    return InputImageRotationMethods._values.map((k, v) => MapEntry(v, k))[rawValue];
   }
 }
 
@@ -75,18 +56,10 @@ extension InputImageRotationMethods on InputImageRotation {
 class Vision {
   Vision._();
 
-  static const MethodChannel channel = MethodChannel('google_ml_kit');
+  static const MethodChannel channel = MethodChannel('google_barcode_kit');
 
   // Creates an instance of [GoogleMlKit] by calling the private constructor
   static final Vision instance = Vision._();
-
-  /// Get an instance of [ImageLabeler] by calling this function
-  /// [imageLabelerOptions]  if not provided it creates [ImageLabeler] with [ImageLabelerOptions]
-  /// You can provide either [CustomImageLabelerOptions] to use a custom tflite model
-  /// Or [AutoMLImageLabelerOptions] to use auto ml vision model trained by you
-  ImageLabeler imageLabeler([dynamic imageLabelerOptions]) {
-    return ImageLabeler._(imageLabelerOptions ?? ImageLabelerOptions());
-  }
 
   /// Returns instance of [BarcodeScanner]. By default it searches the input image for all [BarcodeFormat]s.
   /// To limit the search model to specific [BarcodeFormat] pass list of [BarcodeFormat] as argument.
@@ -94,46 +67,9 @@ class Vision {
     return BarcodeScanner(formats: formatList);
   }
 
-  /// Returns instance of [PoseDetector].By default it returns all [PoseLandmark] available in image
-  /// To limit the result to specific [PoseLandmark] pass list of [PoseLandmark]'s a
-  /// All the 33 positions have been declared as static constants in [PoseLandmark] class
-  PoseDetector poseDetector({PoseDetectorOptions? poseDetectorOptions}) {
-    return PoseDetector(poseDetectorOptions ?? PoseDetectorOptions());
-  }
-
-  /// Creates on instance of [LanguageModelManager].
-  LanguageModelManager languageModelManager() {
-    return LanguageModelManager._();
-  }
-
-  /// Returns an instance of [DigitalInkRecogniser]
-  DigitalInkRecogniser digitalInkRecogniser() {
-    return DigitalInkRecogniser._();
-  }
-
-  /// Return an instance of [TextDetector].
-  TextDetector textDetector() {
-    return TextDetector._();
-  }
-
-  /// Return an instance of [FaceDetector].
-  FaceDetector faceDetector([FaceDetectorOptions? options]) {
-    return FaceDetector._(options ?? const FaceDetectorOptions());
-  }
-
-  /// Returns an instance of [ObjectDetector].
-  ObjectDetector objectDetector(ObjectDetectorOptionsBase options) {
-    return ObjectDetector._(options);
-  }
-
   /// returns an instance of [RemoteModelManager].
   RemoteModelManager remoteModelManager() {
     return RemoteModelManager();
-  }
-
-  /// Returns an instance of Text Detector v2.
-  TextDetectorV2 textDetectorV2() {
-    return TextDetectorV2._();
   }
 }
 
@@ -160,10 +96,8 @@ class InputImage {
   }
 
   /// Create InputImage using bytes.
-  factory InputImage.fromBytes(
-      {required Uint8List bytes, required InputImageData inputImageData}) {
-    return InputImage._(
-        bytes: bytes, imageType: 'bytes', inputImageData: inputImageData);
+  factory InputImage.fromBytes({required Uint8List bytes, required InputImageData inputImageData}) {
+    return InputImage._(bytes: bytes, imageType: 'bytes', inputImageData: inputImageData);
   }
 
   final String? filePath;
@@ -176,8 +110,7 @@ class InputImage {
       'bytes': bytes,
       'type': imageType,
       'path': filePath,
-      'metadata':
-          inputImageData == null ? 'none' : inputImageData!.getMetaData()
+      'metadata': inputImageData == null ? 'none' : inputImageData!.getMetaData()
     };
     return map;
   }
@@ -212,9 +145,7 @@ class InputImageData {
       'height': size.height,
       'rotation': imageRotation.rawValue,
       'imageFormat': inputImageFormat.rawValue,
-      'planeData': planeData
-          ?.map((InputImagePlaneMetadata plane) => plane._serialize())
-          .toList(),
+      'planeData': planeData?.map((InputImagePlaneMetadata plane) => plane._serialize()).toList(),
     };
     return map;
   }
@@ -250,30 +181,24 @@ class InputImagePlaneMetadata {
 /// Class to manage firebase remote models.
 class RemoteModelManager {
   Future<bool> isModelDownloaded(String modelName) async {
-    final result = await Vision.channel.invokeMethod('vision#manageRemoteModel',
-        <String, dynamic>{"task": "check", "model": modelName});
+    final result = await Vision.channel.invokeMethod(
+        'vision#manageRemoteModel', <String, dynamic>{"task": "check", "model": modelName});
     return result as bool;
   }
 
   /// Downloads a model.
   /// Returns `success` if model downloads successfully or model is already downloaded.
   /// On failing to download it throws an error.
-  Future<String> downloadModel(String modelTag,
-      {bool isWifiRequired = true}) async {
-    final result = await Vision.channel.invokeMethod(
-        "vision#manageRemoteModel", <String, dynamic>{
-      "task": "download",
-      "model": modelTag,
-      "wifi": isWifiRequired
-    });
+  Future<String> downloadModel(String modelTag, {bool isWifiRequired = true}) async {
+    final result = await Vision.channel.invokeMethod("vision#manageRemoteModel",
+        <String, dynamic>{"task": "download", "model": modelTag, "wifi": isWifiRequired});
     return result.toString();
   }
 
   /// Deletes a model.
   /// Returns `success` if model is deleted successfully or model is not present.
   Future<String> deleteModel(String modelTag) async {
-    final result = await Vision.channel
-        .invokeMethod("vision#manageRemoteModel", <String, dynamic>{
+    final result = await Vision.channel.invokeMethod("vision#manageRemoteModel", <String, dynamic>{
       "task": "delete",
       "model": modelTag,
     });
